@@ -13,15 +13,15 @@ The QR Code Generator REST API is a tool designed to facilitate the creation and
 
 1. Clone the repository:
 git clone <repository_url>
-
 cd qr_code_api_project
-2. Install dependencies:
+
+3. Install dependencies:
 pip install -r requirements.txt
 
-3. Apply database migrations:
+4. Apply database migrations:
 python manage.py migrate
 
-4. Start the development server:
+5. Start the development server:
 python manage.py runserver
 
 ## Usage
