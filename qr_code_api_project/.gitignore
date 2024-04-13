@@ -1,0 +1,22 @@
+.vscode
+# Django related
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Secret keys
+qr_env/
+
+# Database
+*.sqlite3
+
+# Static files
+/static/
+
+# Media files
+/media/
+
+# Virtual environment
+/venv/
