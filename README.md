@@ -50,7 +50,7 @@ python manage.py runserver
 - Django==4.2
 - djangorestframework==3.12.4
 - psycopg2-binary==2.9.6
-- djangorestframework_simplejwt==*
-- qrcode==*
+- djangorestframework_simplejwt==5.3.1
+- qrcode==7.4.2
 
 
