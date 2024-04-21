@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib import admin
 from .views import register, login, generate_qr_code, get_qr_code_details, get_user_qr_codes, update_qr_code, delete_qr_code, get_all_users, update_user, delete_user
 
 urlpatterns = [
@@ -12,6 +13,7 @@ urlpatterns = [
     path('api/users/', get_all_users, name='get_all_users'),
     path('api/users/<int:pk>/', update_user, name='update_user'),
     path('api/users/<int:pk>/', delete_user, name='delete_user'),
+    path('admin/', admin.site.urls),
     
 ]
 

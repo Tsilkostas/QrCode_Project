@@ -14,22 +14,29 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser
 
 
-@api_view(['POST']) 
+@api_view(['POST'])
 def register(request):
     """
     Register a new user with email and password.
     """
     if request.method == 'POST':
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'error': 'Method "GET" not allowed.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
 
+        if not username or not email or not password:
+            return Response({'error': 'Username, email, and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-from rest_framework_simplejwt.tokens import RefreshToken
+        if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+            return Response({'error': 'Username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.save()
+
+        return Response({'message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
+
+    return Response({'error': 'Method "GET" not allowed.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 @api_view(['POST'])
 def login(request):
@@ -44,10 +51,10 @@ def login(request):
         if user:
             refresh = RefreshToken.for_user(user)
             return Response({'token': str(refresh.access_token)}, status=status.HTTP_200_OK)
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'GET':
         return Response({'message': 'Login endpoint reached'}, status=status.HTTP_200_OK)
-
 
 
 @api_view(['POST'])
@@ -72,15 +79,8 @@ def get_qr_code_details(request, pk):
     Retrieve details of a specific QR code by its ID.
     """
     qr_code = get_object_or_404(QRCode, pk=pk)
-    qr_code_image = generate_qr_code_image(qr_code.data)
-    
-    return Response({
-        'id': qr_code.id,
-        'type': qr_code.type,
-        'data': qr_code.data,
-        'qr_code_image': qr_code_image
-        # Add more fields as needed
-    }, status=status.HTTP_200_OK)
+    qr_code_serializer = QRCodeSerializer(qr_code)
+    return Response(qr_code_serializer.data, status=status.HTTP_200_OK)
     
     
     
@@ -114,8 +114,8 @@ def update_qr_code(request, pk):
     except QRCode.DoesNotExist:
         return Response({"error": "QR code not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'PUT':
-        serializer = QRCodeSerializer(qr_code, data=request.data)
+    if request.method in ['PUT', 'PATCH']:
+        serializer = QRCodeSerializer(qr_code, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

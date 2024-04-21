@@ -1,5 +1,6 @@
 import qrcode
 from io import BytesIO
+import base64
 
 def generate_qr_code_image(data):
     """
@@ -24,6 +25,9 @@ def generate_qr_code_image(data):
     img = qr.make_image(fill_color="black", back_color="white")
 
     img_bytes = BytesIO()
-    img.save(img_bytes, format='PNG')
+    img.save(img_bytes) 
+    img_bytes.seek(0)
+
+    encoded_img = base64.b64encode(img_bytes.read()).decode('utf-8')
     
-    return img_bytes.getvalue()
+    return encoded_img
